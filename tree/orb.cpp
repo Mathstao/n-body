@@ -204,8 +204,8 @@ void orb(vector<Body> & bodies, bound_vec & bounds,
 void global_minmax(const vector<Body> bodies, double * min, double * max){
 
     /* Initialize bounds to infinity */
-    min[0] = min[1] = min[2] = std::numeric_limits<double>::infinity();
-    max[0] = max[1] = max[2] = -std::numeric_limits<double>::infinity();
+    min[0] = min[1] = std::numeric_limits<double>::infinity();
+    max[0] = max[1] = -std::numeric_limits<double>::infinity();
     
     /* Find local min and max bounds */
     for(const Body & b : bodies){

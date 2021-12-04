@@ -14,19 +14,21 @@ array<double, 2> eval_force(const double * r1, double m1, const double * r2, dou
     for(int c = 0; c < 2; c++){
         norm += pow(r1[c] - r2[c], 2);
     }
-    // norm = pow(norm, 1.0 / 2.0);
 
-    // // if (norm < 0.03) {
-    // //     norm = 0.03;
-    // // }
-    
     // for(int c = 0; c < 2; c++){
-    //     f[c] = 0.0001 * M * (r1[c] - r2[c]) / pow(norm, 3);
+    //     f[c] = M * (r1[c] - r2[c]);
+    //     f[c] /= pow(norm, 3.0 / 2.0);
     // }
     // return f;
+
+    norm = pow(norm, 1.0 / 2.0);
+
+    if (norm < 0.03) {
+        norm = 0.03;
+    }
+    
     for(int c = 0; c < 2; c++){
-        f[c] = M * (r1[c] - r2[c]);
-        f[c] /= pow(norm, 3.0 / 2.0);
+        f[c] = 0.0001 * M * (r1[c] - r2[c]) / pow(norm, 3);
     }
     return f;
 }
