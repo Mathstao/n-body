@@ -15,7 +15,7 @@ void create_mpi_body(){
     offsets[0] = offsetof(Body, pos);
     offsets[1] = offsetof(Body, vel);
     offsets[2] = offsetof(Body, m);
-    offsets[2] = offsetof(Body, work);
+    offsets[3] = offsetof(Body, work);
 
     MPI_Type_create_struct(4, blocklengths, offsets, types, &mpi_body_type);
     MPI_Type_commit(&mpi_body_type);
@@ -29,7 +29,7 @@ void create_mpi_cell(){
     offsets[0] = offsetof(MPICell, min_bounds);
     offsets[1] = offsetof(MPICell, max_bounds);
     offsets[2] = offsetof(MPICell, m);
-    offsets[2] = offsetof(MPICell, rm);
+    offsets[3] = offsetof(MPICell, rm);
     offsets[4] = offsetof(MPICell, parent_idx);
 
     MPI_Type_create_struct(5, blocklengths, offsets, types, &mpi_cell_type);
