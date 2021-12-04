@@ -37,7 +37,7 @@ std::pair<std::vector<Body>, int> read_bodies(const char * filename, MPI_Comm co
     int i = 0;
     while (std::getline(infile, line)){
         std::istringstream iss(line);
-        double x, y, z, vx, vy, vz, m;
+        double x, y, vx, vy, m;
         if (!(iss >> x >> y >> vx >> vy >> m)) { break; } // error
         if((i % size) == rank){
             bodies.push_back(Body{{x, y}, {vx, vy}, m, 1});

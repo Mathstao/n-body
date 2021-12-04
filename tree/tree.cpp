@@ -34,7 +34,7 @@ Tree::~Tree(){
 
 void Tree::delete_subtree(Cell * cell){
     /* delete subcells first */
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         if(cell->subcells[i] != nullptr){
             delete_subtree(cell->subcells[i]);
         }
@@ -59,7 +59,7 @@ void Tree::insert_body(Cell * cell, const Body * b){
         /* if cell already contains a body, but is not split */
         if(cell->subcells[0] == nullptr){   
             /* split the cell  */
-            for(int i = 0; i < 8; i++){
+            for(int i = 0; i < 4; i++){
                 /* create subcell */
                 Cell * subcell = new Cell();
 
@@ -85,7 +85,7 @@ void Tree::insert_body(Cell * cell, const Body * b){
         }
 
         /* insert new body into subcell */
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 4; i++){
             if(cell->subcells[i] != nullptr and coord_in_cell(cell->subcells[i], b->pos)){
                 insert_body(cell->subcells[i], b);
                 break;
@@ -106,7 +106,7 @@ void Tree::insert_emptycell(const double * min_bounds, const double * max_bounds
 
 void Tree::insert_emptycell(Cell * cell, const double * min_bounds, const double * max_bounds){
     /* loop through subcells */
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         /* if bounds in subcell, recursively insert */
         if(cell->subcells[i] != nullptr and bounds_in_cell(cell->subcells[i], min_bounds, max_bounds)){
             insert_emptycell(cell->subcells[i], min_bounds, max_bounds); 
@@ -141,7 +141,7 @@ void Tree::insert_cell(Cell * cell, Cell * cell_to_insert){
     }
 
     /* insert cell in subcell */
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         /* if bounds fit in cell */
         if(cell->subcells[i] != nullptr and bounds_in_cell(cell->subcells[i], 
                                                 cell_to_insert->min_bounds, cell_to_insert->max_bounds)){
@@ -178,7 +178,7 @@ void Tree::insert_cell(Cell * cell,
     }
  
     /* otherwise, insert cell in subcell */
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         /* if bounds fit in cell */
         if(cell->subcells[i] != nullptr and bounds_in_cell(cell->subcells[i], min_bounds, max_bounds)){
             /* recursively insert */
@@ -214,7 +214,7 @@ string Tree::subtree_str(Cell * cell, bool fulltree) const{
     
     int count = 0;
     if(!fulltree){
-        for(count = 0; count < 8; count++){
+        for(count = 0; count < 4; count++){
             if(cell->subcells[count] == nullptr){
                 break;
             }
@@ -224,7 +224,7 @@ string Tree::subtree_str(Cell * cell, bool fulltree) const{
     /* if not leaf */
     if(cell->subcells[0] != nullptr and (fulltree or count <= 2)){
         /* call function for each subcell */
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 4; i++){
             if(cell->subcells[i] != nullptr){
                 sstream << subtree_str(cell->subcells[i], fulltree);
             }
@@ -292,7 +292,7 @@ void Tree::cells_to_send(Cell * cell, Cell * parent, const double * min_bounds, 
     
     /* if subtree of cell is needed by domain, we open it */
     if(opening_criterion(cell, min_bounds, max_bounds)){
-        for(int i = 0; i < 8; i++){
+        for(int i = 0; i < 4; i++){
             if(cell->subcells[i] != nullptr){
                 /* send subcells */
                 cells_to_send(cell->subcells[i], cell,  min_bounds, max_bounds, min_depth, depth + 1, cells);
@@ -306,7 +306,7 @@ void Tree::cells_to_send(Cell * cell, Cell * parent, const double * min_bounds, 
     
 void Tree::delete_descendants(Cell * cell){
     /* delete subcells */
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         if(cell->subcells[i] != nullptr){
             delete_subtree(cell->subcells[i]);
             cell->subcells[i] = nullptr;
@@ -327,7 +327,7 @@ void Tree::prune_tree(Cell * cell, const double * min_bounds, const double * max
         }
         /* else call prune recursively */
         else{
-            for(int i = 0; i < 8; i++){
+            for(int i = 0; i < 4; i++){
                 if(cell->subcells[i] != nullptr){
                     prune_tree(cell->subcells[i], min_bounds, max_bounds);
                 }
@@ -356,7 +356,7 @@ array<double, 2> Tree::compute_force(const Cell * cell, const Body * b){
 
     /* accumulate force evaluation from subcells */
     array<double, 2> ftot = {{0, 0}};
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 4; i++){
         if(cell->subcells[i]!=nullptr){
             /* call force computation recursively */
             array<double, 2> f = compute_force(cell->subcells[i], b);
@@ -384,7 +384,7 @@ int Tree::size(bool complete_tree){
 int Tree::size(Cell * c, bool complete_tree){
     int s = 0;
     int i;
-    for(i = 0; i < 8; i++){
+    for(i = 0; i < 4; i++){
         if(c->subcells[i] != nullptr){
             s += size(c->subcells[i], complete_tree);
         }

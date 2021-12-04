@@ -111,7 +111,7 @@ vector<Cell *> construct_received_trees(const vector<MPICell> & recv_cells){
         }
         else{
             Cell * parent = all_cells.at(mpicell.parent_idx);
-            for(int i = 0; i < 8; i++){
+            for(int i = 0; i < 4; i++){
                 if(parent->subcells[i] == nullptr){
                     parent->subcells[i] = cell; 
                     break;

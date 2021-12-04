@@ -46,12 +46,14 @@ private:
     int steps = 100;
 
     // time step
+    // double dt = 0.005;
     double dt = 1;
 
     // barnes hut approximation constant
     double theta = 1;
 
     // gravitational constant
+    // double g = 0.0001;
     double g = 1;
 
     // load bodies from file
