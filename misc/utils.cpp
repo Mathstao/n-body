@@ -54,7 +54,7 @@ double bisection(double a, double b, std::function<double (double)> f, double to
 double dist_aabb(const double * a_min, const double * a_max, const double * b_min, const double * b_max){
     double dist = 0;
     double delta;
-    for(int c = 0; c < 3; c++){
+    for(int c = 0; c < 2; c++){
     
         if(a_min[c] > b_max[c]){
                delta = a_min[c] - b_max[c];

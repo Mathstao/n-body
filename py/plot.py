@@ -28,7 +28,7 @@ count = 0
 min_pos = math.inf
 max_pos = -math.inf
 for i in range(len(a)):
-    if len(a[i].split()) < 3:
+    if len(a[i].split()) < 2:
         positions_in_time_step = np.array(positions)
         if np.max(positions_in_time_step) > max_pos:
             max_pos = np.max(positions_in_time_step)

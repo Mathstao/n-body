@@ -15,7 +15,7 @@ using std::vector; using std::array;
 using std::pair;
 
 
-typedef vector<pair<array<double, 3>, array<double, 3> > > bound_vec;
+typedef vector<pair<array<double, 2>, array<double, 2> > > bound_vec;
 
 /*
 Builds to local tree consisting of the ORB splits and the Barnes-Hut tree. 

@@ -22,10 +22,10 @@ Tree::Tree(const double * min_bounds, const double * max_bounds, double theta){
 
     /* create root cell */
     root = new Cell();
-    copy(min_bounds, &min_bounds[3], root->min_bounds);
-    copy(max_bounds, &max_bounds[3], root->max_bounds);
+    copy(min_bounds, &min_bounds[2], root->min_bounds);
+    copy(max_bounds, &max_bounds[2], root->max_bounds);
     root->m = 0;
-    fill(root->subcells, &root->subcells[8], nullptr);
+    fill(root->subcells, &root->subcells[4], nullptr);
 }
 
 Tree::~Tree(){
@@ -66,7 +66,7 @@ void Tree::insert_body(Cell * cell, const Body * b){
                 subcell->m = 0;
 
                 /* find min and max bounds of cell */
-                for(int c = 0; c < 3; c++){
+                for(int c = 0; c < 2; c++){
                     double half_side = (cell->max_bounds[c] - cell->min_bounds[c]) / 2;
                     int shift = ((i >> c) & 1);
                     subcell->min_bounds[c] = cell->min_bounds[c] + shift * half_side;
@@ -93,7 +93,7 @@ void Tree::insert_body(Cell * cell, const Body * b){
         }
 
         /* update mass and center of mass for cell */
-        for(int c = 0; c < 3; c++){
+        for(int c = 0; c < 2; c++){
             cell->rm[c] = (cell->m * cell->rm[c] + b->m * b->pos[c]) / (cell->m + b->m);
         }
         cell->m += b->m;
@@ -115,10 +115,10 @@ void Tree::insert_emptycell(Cell * cell, const double * min_bounds, const double
         /* if bounds does not fit in subcell, create a new one */
         else if(cell->subcells[i] == nullptr){
             Cell * subcell = new Cell();
-            copy(min_bounds, &min_bounds[3], subcell->min_bounds);
-            copy(max_bounds, &max_bounds[3], subcell->max_bounds);
+            copy(min_bounds, &min_bounds[2], subcell->min_bounds);
+            copy(max_bounds, &max_bounds[2], subcell->max_bounds);
             subcell->m = 0;
-            fill(subcell->subcells, &subcell->subcells[8], nullptr);
+            fill(subcell->subcells, &subcell->subcells[4], nullptr);
             cell->subcells[i] = subcell;
             return;
         }
@@ -134,7 +134,7 @@ void Tree::insert_cell(Cell * cell, Cell * cell_to_insert){
 
     /* update mass and center of mass */
     if(cell->m != 0 or cell_to_insert->m != 0){
-        for(int c = 0; c < 3; c++){
+        for(int c = 0; c < 2; c++){
             cell->rm[c] = (cell->m * cell->rm[c] + cell_to_insert->m * cell_to_insert->rm[c]) / (cell->m + cell_to_insert->m);
         }
         cell->m += cell_to_insert->m;
@@ -169,7 +169,7 @@ void Tree::insert_cell(Cell * cell,
     if(same_cell(cell, min_bounds, max_bounds)){
         /* update mass and center of mass */
         if(cell->m != 0 or m != 0){
-            for(int c = 0; c < 3; c++){
+            for(int c = 0; c < 2; c++){
                 cell->rm[c] = (cell->m * cell->rm[c] + m * rm[c]) / (cell->m + m);
             }
             cell->m += m;
@@ -188,11 +188,11 @@ void Tree::insert_cell(Cell * cell,
         /* if bounds does not fit in subcell, create a new one */
         else if(cell->subcells[i] == nullptr){
             Cell * subcell = new Cell();
-            copy(min_bounds, &min_bounds[3], subcell->min_bounds);
-            copy(max_bounds, &max_bounds[3], subcell->max_bounds);
-            copy(rm, &rm[3], subcell->rm);
+            copy(min_bounds, &min_bounds[2], subcell->min_bounds);
+            copy(max_bounds, &max_bounds[2], subcell->max_bounds);
+            copy(rm, &rm[2], subcell->rm);
             subcell->m = m;
-            fill(subcell->subcells, &subcell->subcells[8], nullptr);
+            fill(subcell->subcells, &subcell->subcells[4], nullptr);
             subcell->inserted=true;
             cell->subcells[i] = subcell;
             return;
@@ -234,13 +234,13 @@ string Tree::subtree_str(Cell * cell, bool fulltree) const{
     else{
         /* output center of mass */
         //if(cell->m != 0){
-        //    for(int c = 0; c < 3; c++){
+        //    for(int c = 0; c < 2; c++){
         //        sstream << cell->rm[c] << " ";
         //    }
         //    sstream << std::endl;
         //}
         /* output cell boundaries */
-        for(int c = 0; c < 3; c++){
+        for(int c = 0; c < 2; c++){
             sstream << cell->min_bounds[c] << " " << cell->max_bounds[c] << " ";
         }
         sstream << std::endl;
@@ -336,11 +336,11 @@ void Tree::prune_tree(Cell * cell, const double * min_bounds, const double * max
     }
 }
 
-array<double, 3> Tree::compute_force(const Body * b){
+array<double, 2> Tree::compute_force(const Body * b){
     return compute_force(root, b);
 }
 
-array<double, 3> Tree::compute_force(const Cell * cell, const Body * b){
+array<double, 2> Tree::compute_force(const Cell * cell, const Body * b){
 
     /* if cell is non empty and we dont want to open it or it is leaf cell */
     if(cell->m != 0 and (!opening_criterion(cell, b->pos, b->pos) or cell->subcells[0] == nullptr)){
@@ -350,19 +350,19 @@ array<double, 3> Tree::compute_force(const Cell * cell, const Body * b){
         }
         /* is this really needed? */
         else{
-            return {{0, 0, 0}};
+            return {{0, 0}};
         }
     }
 
     /* accumulate force evaluation from subcells */
-    array<double, 3> ftot = {{0, 0, 0}};
+    array<double, 2> ftot = {{0, 0}};
     for(int i = 0; i < 8; i++){
         if(cell->subcells[i]!=nullptr){
             /* call force computation recursively */
-            array<double, 3> f = compute_force(cell->subcells[i], b);
+            array<double, 2> f = compute_force(cell->subcells[i], b);
 
             /* accumulate */
-            for(int c = 0; c < 3; c++){
+            for(int c = 0; c < 2; c++){
                 ftot[c] += f[c];
             }
         }
@@ -404,7 +404,7 @@ int Tree::size(Cell * c, bool complete_tree){
 }
 
 bool coord_in_cell(Cell * cell, const double * pos){
-    for(int c = 0; c < 3; c++){
+    for(int c = 0; c < 2; c++){
         /* if coordinate does not lie in cell boundary */
         if(pos[c] < cell->min_bounds[c] or pos[c] > cell->max_bounds[c]){
             return false;
@@ -414,7 +414,7 @@ bool coord_in_cell(Cell * cell, const double * pos){
 }
 
 bool same_cell(Cell * cell, const double * min_bounds, const double * max_bounds){
-    for(int c = 0; c < 3; c++){
+    for(int c = 0; c < 2; c++){
         /* if coordinate boundaries or not same */
         if(min_bounds[c] != cell->min_bounds[c] or max_bounds[c] != cell->max_bounds[c]){
             return false;
@@ -426,7 +426,7 @@ bool same_cell(Cell * cell, const double * min_bounds, const double * max_bounds
 double cell_volume(const Cell * cell){
     double v = 0;
     double tmp;
-    for(int c = 0; c < 3; c++){
+    for(int c = 0; c < 2; c++){
        /* coordinate side length */
        tmp = (cell->max_bounds[c] - cell->min_bounds[c]);
        if(v == 0){
@@ -441,7 +441,7 @@ double cell_volume(const Cell * cell){
 
 
 bool bounds_in_cell(Cell * cell, const double * min_bounds, const double * max_bounds){
-    for(int c = 0; c < 3; c++){
+    for(int c = 0; c < 2; c++){
         /* if coordinate boundary does not fit in cell*/
         if(cell->min_bounds[c] > min_bounds[c] or cell->max_bounds[c] < max_bounds[c]){
             return false;

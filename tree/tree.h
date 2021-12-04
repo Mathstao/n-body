@@ -10,11 +10,11 @@
 using std::vector; using std::array;
 
 struct Cell {
-    double min_bounds[3];
-    double max_bounds[3];
+    double min_bounds[2];
+    double max_bounds[2];
     double m = 0;   // mass 
-    double rm[3]; // center of mass
-    Cell * subcells[8]; // eight subcells maximum
+    double rm[2]; // center of mass
+    Cell * subcells[4]; // eight subcells maximum
     bool inserted = false;
     const Body * b = nullptr;
     bool send_as_leaf = false;
@@ -96,7 +96,7 @@ public:
     @param pos : position of body
     @param m : mass of body
     */
-    array<double, 3> compute_force(const Body * b);
+    array<double, 2> compute_force(const Body * b);
 
     /*
     constructs string representation of tree
@@ -212,7 +212,7 @@ private:
     @param pos : position of body
     @param m : mass of body
     */
-    array<double, 3> compute_force(const Cell * cell, const Body * b);
+    array<double, 2> compute_force(const Cell * cell, const Body * b);
 
     /*
     Constructs string representation of subtree

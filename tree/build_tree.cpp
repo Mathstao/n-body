@@ -104,7 +104,7 @@ vector<Cell *> construct_received_trees(const vector<MPICell> & recv_cells){
         copy(begin(mpicell.min_bounds), end(mpicell.min_bounds), begin(cell->min_bounds));         
         copy(begin(mpicell.max_bounds), end(mpicell.max_bounds), begin(cell->max_bounds));         
         copy(begin(mpicell.rm), end(mpicell.rm), begin(cell->rm));         
-        fill(cell->subcells, &cell->subcells[8], nullptr);
+        fill(cell->subcells, &cell->subcells[4], nullptr);
 
         if(mpicell.parent_idx == -1){
             root_cells.push_back(cell);

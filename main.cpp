@@ -40,10 +40,10 @@ int main(int argc, char * argv[]){
     int size, rank, tmax, N, nbodies;
     std::vector<Body> bodies;
     std::vector<pair<double, int> > splits;
-    vector<pair<array<double, 3>, array<double, 3> > > bounds, other_bounds; 
+    vector<pair<array<double, 2>, array<double, 2> > > bounds, other_bounds; 
     vector<pair<int, bool> > partners;
     vector<double> comp_time;
-    double dt, min[3], max[3];
+    double dt, min[2], max[2];
     double start_time, stop_time;
     InputParser ip;
     bool overwrite;
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]){
             nbodies++;
         }
         double lim = (double) 10 * N;
-        bodies = generate_bodies(nbodies, {{-lim, -lim, -lim}}, {{lim, lim, lim}}, rank);
+        bodies = generate_bodies(nbodies, {{-lim, -lim}}, {{lim, lim}}, rank);
     }
 
     /* Write initial positions to file */
@@ -122,11 +122,11 @@ int main(int argc, char * argv[]){
         build_tree(bodies, bounds, other_bounds, partners, tree, rank);
 
         /* Compute forces */
-        std::vector<array<double, 3> > forces;
+        std::vector<array<double, 2> > forces;
         for(Body & b : bodies){
             /* time the computation */
             double start_time = MPI_Wtime();
-            array<double, 3> f = tree.compute_force(&b);
+            array<double, 2> f = tree.compute_force(&b);
             /* update the workload for the body */
             b.work = MPI_Wtime() - start_time;
             forces.push_back(f);
@@ -135,7 +135,7 @@ int main(int argc, char * argv[]){
         /* Update positions */
         for (int i = 0; i < bodies.size(); i++) {
             Body & b = bodies[i];
-            for(int c = 0; c < 3; c++){
+            for(int c = 0; c < 2; c++){
                 b.vel[c] = b.vel[c] + forces[i][c] * dt / b.m;
                 b.pos[c] = b.pos[c] + b.vel[c] * dt;
             }

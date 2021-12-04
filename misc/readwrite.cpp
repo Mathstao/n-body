@@ -38,9 +38,9 @@ std::pair<std::vector<Body>, int> read_bodies(const char * filename, MPI_Comm co
     while (std::getline(infile, line)){
         std::istringstream iss(line);
         double x, y, z, vx, vy, vz, m;
-        if (!(iss >> x >> y >> z >> vx >> vy >> vz >> m)) { break; } // error
+        if (!(iss >> x >> y >> vx >> vy >> m)) { break; } // error
         if((i % size) == rank){
-            bodies.push_back(Body{{x, y, z}, {vx, vy, vz}, m, 1});
+            bodies.push_back(Body{{x, y}, {vx, vy}, m, 1});
         }
         i++;
     }
@@ -76,7 +76,7 @@ void write_bodies(const char * filename, const std::vector<Body> & bodies, MPI_C
     }
 
     for(const Body & b : bodies){
-        myfile << b.pos[0] << " " << b.pos[1] << " " << b.pos[2] << std::endl;
+        myfile << b.pos[0] << " " << b.pos[1] << std::endl;
     }
 
     if(rank != size - 1){

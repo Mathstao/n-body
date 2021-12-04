@@ -12,7 +12,7 @@ print(N / (lim[1] - lim[0])**3)
 
 bodies = []
 
-omega = float(sys.argv[3])
+omega = float(sys.argv[2])
 
 for i in range(N):
     x, y, z = [random.uniform(*lim) for i in range(3)]

@@ -6,6 +6,6 @@
 
 using std::array;
 
-array<double, 3> eval_force(const double * r1, double m1, const double * r2, double m2);
+array<double, 2> eval_force(const double * r1, double m1, const double * r2, double m2);
 
 #endif // MODEL_H_N_BODY
