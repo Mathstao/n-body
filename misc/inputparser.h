@@ -82,13 +82,11 @@ private:
 
     // clock the run
     std::string out_time_fn = "time.txt";
-    bool clock = false;
+    bool clock = true;
 
     // summary
     bool summarize = false;
     std::string summary_fn;
 };
-
-void print_usage(int argc, char** argv);
 
 #endif // _INPUTPARSER_H_NBODY_

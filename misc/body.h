@@ -3,6 +3,7 @@
 #define _BODY_H_N_BODY_
 
 typedef struct {
+    int id;
     double pos[2];
     double vel[2];
     double m;

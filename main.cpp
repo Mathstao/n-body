@@ -34,6 +34,10 @@
 /* Body generator */
 #include "misc/gen_bodies.h"
 
+#include <string>
+#include <fstream>
+#include <sstream>
+
 
 int main(int argc, char * argv[]){
     
@@ -66,7 +70,6 @@ int main(int argc, char * argv[]){
     if(!ip.parse(argc, argv)){
         if(rank == 0){
             std::cout << "Error: Invalid command line input" << std::endl;
-            print_usage(argc, argv);
         }
         return -1; 
     }
@@ -90,11 +93,29 @@ int main(int argc, char * argv[]){
         bodies = generate_bodies(nbodies, {{-lim, -lim}}, {{lim, lim}}, rank);
     }
 
-    /* Write initial positions to file */
-    overwrite = true;
-    if(ip.write_positions()){
-        write_bodies(ip.out_file().c_str(), bodies, MPI_COMM_WORLD, overwrite);
+    if (rank == 0) {
+        // Get the size of N
+        int N;
+        std::ifstream in_file;
+        in_file.open(ip.in_file());
+        std::string line;
+        std::getline(in_file, line);
+        std::istringstream iss(line);
+        iss >> N;
+        in_file.close();
+
+        // Write the size of N
+        std::ofstream out_file;
+        out_file.open(ip.out_file());
+        out_file << N << std::endl;
+        out_file.close();
     }
+
+    // /* Write initial positions to file */
+    // overwrite = true;
+    // if(ip.write_positions()){
+    //     write_bodies(ip.out_file().c_str(), bodies, MPI_COMM_WORLD, overwrite);
+    // }
 
     
     tmax = ip.n_steps(); // number of time steps
@@ -140,57 +161,26 @@ int main(int argc, char * argv[]){
                 b.pos[c] = b.pos[c] + b.vel[c] * dt;
             }
         }
-        
-        /* Output */
-        /* Print time step to stdout */
-        if(rank == 0 and ip.verbose()){
-            std::cout << "\rTime step: " << t + 1 << "/" << tmax;
-            if(t == tmax - 1){
-                std::cout << std::endl;
-            }
+    }
+
+
+    /* Stop the time */
+    if(ip.clock_run()){
+        MPI_Barrier(MPI_COMM_WORLD);
+        stop_time = MPI_Wtime(); 
+    }
+
+    /* Write running time */
+    if(ip.clock_run()){
+        if(rank == 0){
+            // write_to_file(ip.out_time_file().c_str(), stop_time - start_time, overwrite);
+            printf("%f\n", stop_time - start_time);
         }
+    }
 
-        if(ip.sampling_interval() == 1 or (t % ip.sampling_interval() == 0 and t != 0)){
-
-            /* Stop the time */
-            if(ip.clock_run()){
-                MPI_Barrier(MPI_COMM_WORLD);
-                stop_time = MPI_Wtime(); 
-            }
-
-            /* Write tree */
-            if(rank == 0 and ip.write_tree()){
-                write_tree(ip.out_tree_file().c_str(), tree, true, overwrite);
-            }
-            
-            /* Write tree size*/
-            if(rank == 0 and ip.write_tree_size()){
-                write_to_file(ip.out_tree_size_file().c_str(), tree.size(), overwrite);
-            }
-
-            /* Write positions */
-            if(ip.write_positions()){
-                write_bodies(ip.out_file().c_str(), bodies, MPI_COMM_WORLD, false);
-            }
-
-            /* Write running time */
-            if(ip.clock_run()){
-                if(rank == 0){
-                    write_to_file(ip.out_time_file().c_str(), stop_time - start_time, overwrite);
-                }
-                
-            }
-
-            if(overwrite){
-                overwrite = false;
-            }
-
-            if(ip.clock_run()){
-                // start the time
-                MPI_Barrier(MPI_COMM_WORLD);
-                start_time = MPI_Wtime();        
-            }
-        }
+    /* Write positions */
+    if(ip.write_positions()){
+        write_bodies(ip.out_file().c_str(), bodies, MPI_COMM_WORLD, false);
     }
 
     /* Finalize */

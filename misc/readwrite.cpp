@@ -43,14 +43,12 @@ std::pair<std::vector<Body>, int> read_bodies(const char * filename, MPI_Comm co
 
     int i = 0;
     while (std::getline(infile, line)){
-        // printf("%s\n", line.c_str());
         std::istringstream iss(line);
         double x, y, vx, vy, m;
         int id;
         if (!(iss >> id >> x >> y >> m >> vx >> vy)) { break; } // error
-        printf("%f %f %f %f %f\n", x, y, m, vx, vy);
         if((i % size) == rank){
-            bodies.push_back(Body{{x, y}, {vx, vy}, m, 1});
+            bodies.push_back(Body{id, {x, y}, {vx, vy}, m, 1});
         }
         i++;
     }
@@ -85,8 +83,13 @@ void write_bodies(const char * filename, const std::vector<Body> & bodies, MPI_C
         }
     }
 
+    // printf("%lu\n", bodies.size());
+    // myfile << bodies.size() << std::endl;
+
     for(const Body & b : bodies){
-        myfile << b.pos[0] << " " << b.pos[1] << std::endl;
+        // myfile << b.pos[0] << " " << b.pos[1] << std::endl;
+        myfile << b.id << " " << b.pos[0] << " " << b.pos[1] << " " << b.m << " " << b.vel[0] << b.vel[1] << std::endl;
+
     }
 
     if(rank != size - 1){
@@ -97,6 +100,8 @@ void write_bodies(const char * filename, const std::vector<Body> & bodies, MPI_C
         myfile << std::endl;
         myfile.close();
     }
+
+    // myfile.close();
 }
 
 void write_to_file(const char * filename, const double x, bool overwrite){
