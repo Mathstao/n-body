@@ -88,7 +88,7 @@ void write_bodies(const char * filename, const std::vector<Body> & bodies, MPI_C
 
     for(const Body & b : bodies){
         // myfile << b.pos[0] << " " << b.pos[1] << std::endl;
-        myfile << b.id << " " << b.pos[0] << " " << b.pos[1] << " " << b.m << " " << b.vel[0] << b.vel[1] << std::endl;
+        myfile << b.id << " " << b.pos[0] << " " << b.pos[1] << " " << b.m << " " << b.vel[0] << " " << b.vel[1] << std::endl;
 
     }
 
